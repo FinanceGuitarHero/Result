@@ -1,0 +1,15 @@
+app:
+  telegram-token: ${TELEGRAM_TOKEN}
+
+server:
+  port: 8090
+
+spring:
+  application:
+    name: bot
+  config:
+    import: optional:file:.env[.properties]
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui

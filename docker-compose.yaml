@@ -10,3 +10,19 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: finance_db
+  finance-service:
+    image: smartfinance
+    build: backend
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/finance_db
+  bot-service:
+    image: bot-service
+    build: bot
+    ports:
+      - '8090:8090'
+    depends_on:
+      - finance-service
