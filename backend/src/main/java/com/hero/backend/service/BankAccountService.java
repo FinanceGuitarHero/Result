@@ -22,7 +22,7 @@ public class BankAccountService {
     @Transactional
     public Optional<Boolean> addBank(BankDto bankDto){
         if (bankAccountRepo.existsByName(bankDto.name())){
-            return Optional.of(false);
+            return Optional.empty();
         }
         var user = tgUserService.getUserByTgId(bankDto.id());
         if (user.isEmpty()){
