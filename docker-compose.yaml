@@ -19,10 +19,21 @@ services:
       - db
     environment:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/finance_db
-  bot-service:
-    image: bot-service
-    build: bot
+  bot-client:
+    image: bot-client:latest
+    build: botClient
+    restart: "no"
     ports:
-      - '8090:8090'
-    depends_on:
-      - finance-service
+      - "8086:8080"
+    environment:
+      FINANCE_HERO_TG_BOT_TOKEN: ${FINANCE_HERO_TG_BOT_TOKEN}
+  rabbitmq:
+    image: rabbitmq:3.13.4
+    restart: "no"
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: rabbitmq-diagnostics -q status
+      interval: 10s
+      timeout: 5s
+      retries: 5
