@@ -1,5 +1,7 @@
 package com.hero.botClient.controller;
 
+import com.hero.botClient.service.ProducerService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.client.okhttp.OkHttpTelegramClient;
@@ -12,15 +14,19 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.TelegramClient;
 
 @Component
+@Slf4j
 public class TgBot implements SpringLongPollingBot, LongPollingSingleThreadUpdateConsumer {
 
     private final TelegramClient telegramClient;
 
     private final String token;
 
-    public TgBot(@Value("${bot.token}") String botToken) {
+    private final ProducerService producerService;
+
+    public TgBot(@Value("${bot.token}") String botToken, ProducerService producerService) {
         this.token = botToken;
         telegramClient = new OkHttpTelegramClient(getBotToken());
+        this.producerService = producerService;
     }
 
     @Override
@@ -33,7 +39,7 @@ public class TgBot implements SpringLongPollingBot, LongPollingSingleThreadUpdat
         return this;
     }
 
-    private void sendMessage(long id, String text){
+    public void sendMessage(long id, String text){
         SendMessage message = SendMessage // Create a message object
                 .builder()
                 .chatId(id)
@@ -47,10 +53,15 @@ public class TgBot implements SpringLongPollingBot, LongPollingSingleThreadUpdat
     }
     @Override
     public void consume(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            String message_text = update.getMessage().getText();
-            long chat_id = update.getMessage().getChatId();
-            sendMessage(chat_id, message_text);
+        if (update.hasMessage()) {
+            if (update.getMessage().getText().startsWith("/")){
+                producerService.sendCommand(update);
+            }
+
+//            String message_text = update.getMessage().getText();
+//
+//            long chat_id = update.getMessage().getChatId();
+//            sendMessage(chat_id, message_text);
         }
 
     }

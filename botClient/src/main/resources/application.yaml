@@ -1,2 +1,13 @@
 bot:
   token: ${FINANCE_HERO_TG_BOT_TOKEN}
+server:
+  port: 8086
+spring:
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+queues:
+  commands_queue: ${COMMANDS_QUEUE}
+  answer_queue: ${ANSWER_QUEUE}

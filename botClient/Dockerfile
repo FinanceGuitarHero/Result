@@ -1,15 +1,19 @@
-FROM bellsoft/liberica-openjre-debian:22.0.1 AS layers
-WORKDIR /application
-COPY target/*.jar app.jar
-RUN java -Djarmode=layertools -jar app.jar extract
+FROM maven:3.8.4-openjdk-17 as build
 
-FROM bellsoft/liberica-openjre-debian:22.0.1
-VOLUME /tmp
-RUN useradd -ms /bin/bash spring-user
-USER spring-user
-COPY --from=layers /application/dependencies/ ./
-COPY --from=layers /application/spring-boot-loader/ ./
-COPY --from=layers /application/snapshot-dependencies/ ./
-COPY --from=layers /application/application/ ./
+LABEL authors="denmo"
 
-ENTRYPOINT ["java", "org.springframework.boot.loader.launch.JarLauncher"]
+WORKDIR /app
+
+COPY src src
+COPY pom.xml .
+
+RUN mvn package -DskipTests
+
+FROM eclipse-temurin:17-jre-alpine
+
+WORKDIR /app
+COPY --from=build /app/target/*.jar app.jar
+
+EXPOSE 8086
+
+CMD ["java", "-jar", "app.jar"]

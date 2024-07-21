@@ -1,3 +1,5 @@
+server:
+  port: 8080
 spring:
   datasource:
     url: ${POSTGRES_HOST:jdbc:postgresql://localhost:5432/finance_db}
@@ -11,3 +13,11 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+queues:
+  commands_queue: ${COMMANDS_QUEUE}
+  answer_queue: ${ANSWER_QUEUE}
